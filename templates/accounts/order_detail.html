@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="card mx-auto p-4 shadow-sm" style="max-width: 800px; background-color: #f9f9f9;">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <img src="{% static 'images/logo.PNG' %}" alt="Company Logo" style="max-height: 40px;">
+            </div>
+            <div class="col-md-6 text-md-right text-sm-left">
+                <strong>Invoiced To</strong><br>
+                {{ order.full_name }}<br>
+                {{ order.full_address }}<br>
+                {{ order.city }}, {{ order.state }}<br>
+                {{ order.country }}<br>
+                Postcode: {{ order.postcode }}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="bg-light p-3 rounded">
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Order:</strong> {{ order.order_number }}</li>
+                        <li><strong>Transaction:</strong> {{ order.payment.payment_id }}</li>
+                        <li><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</li>
+                        <li><strong>Status:</strong> {{ order.payment.status }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-3">
+            <table class="table table-bordered text-center">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Products</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_detail %}
+                    <tr>
+                        <td class="text-left">
+                            {{ item.product.product_name }}<br>
+                            {% if item.variation.all %}
+                            <small class="text-muted">
+                                {% for i in item.variation.all %}
+                                    {{ i.variation_category|capfirst }}: {{ i.variation_value|capfirst }}<br>
+                                {% endfor %}
+                            </small>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.product_price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-light">
+                    <tr>
+                        <th colspan="2" class="text-right">Sub Total:</th>
+                        <th>৳{{ subtotal|floatformat:2 }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">VAT/TAX:</th>
+                        <th>৳{{ order.tax|floatformat:2 }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">Grand Total:</th>
+                        <th><strong>৳{{ order.order_total|floatformat:2 }}</strong></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-center">
+            <p class="mb-0">Thank you for shopping with us!</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .invoice-footer {
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %}
